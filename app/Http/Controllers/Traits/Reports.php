@@ -20,6 +20,7 @@ use App\Models\CompanyPark;
 use App\Models\Consultancy;
 use App\Models\Company;
 use App\Models\CompanyData;
+use App\Models\TollPayment;
 
 trait Reports
 {
@@ -49,6 +50,7 @@ trait Reports
         $total_drivers = [];
         $total_company_adjustments = [];
         $total_average = [];
+        $total_tolls = [];
 
         foreach ($drivers as $driver) {
 
@@ -163,6 +165,15 @@ trait Reports
 
             $total_fuel_transactions[] = $fuel_transactions;
 
+            //Tool
+            $tolls = 0;
+            if ($driver->tool_card) {
+                $tolls = TollPayment::where([
+                    'card' => $driver->tool_card->code
+                ])
+                    ->sum('total');
+            }
+
             //ADJUSTMENTS
             $adjustments = Adjustment::whereHas('drivers', function ($query) use ($driver) {
                 $query->where('id', $driver->id);
@@ -262,12 +273,13 @@ trait Reports
             $driver->refunds = $refunds;
             $driver->adjustments = $adjustments;
             $driver->fleet_management = $fleet_management;
+            $driver->tools = $tolls ?? 0;
 
             //BALANCE
             $driver_balance = DriversBalance::where('driver_id', $driver->id)->orderBy('id', 'desc')->first();
             $driver->balance = $driver_balance ? $driver_balance->drivers_balance : 0;
 
-            $driver->total = $earnings_after_discount + $tips_after_discount - $fuel_transactions + $adjustments - $fleet_management;
+            $driver->total = $earnings_after_discount + $tips_after_discount - $fuel_transactions - $tolls + $adjustments - $fleet_management;
 
             $total_uber[] = $uber_total_earnings;
             $total_bolt[] = $bolt_total_earnings;
@@ -277,6 +289,7 @@ trait Reports
             $total_tips_after_discount[] = $tips_after_discount;
             $total_drivers[] = $driver->total;
             $total_average[] = $average;
+            $total_tolls[] = $tolls;
 
             $current_account = CurrentAccount::where([
                 'tvde_week_id' => $tvde_week_id,
@@ -302,7 +315,8 @@ trait Reports
             'total_fleet_management' => array_sum($total_fleet_management),
             'total_drivers' => array_sum($total_drivers),
             'total_company_adjustments' => array_sum($total_company_adjustments),
-            'total_average' => array_sum($total_average)
+            'total_average' => array_sum($total_average),
+            'total_tolls' => array_sum($total_tolls)
         ]);
 
         return [
