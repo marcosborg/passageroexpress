@@ -32,6 +32,7 @@ trait Reports
         $drivers = Driver::where('company_id', $company_id)
             ->where('state_id', 1)
             ->orderBy('name')
+            ->where('id', 15)
             ->get()
             ->load([
                 'contract_vat',
@@ -169,7 +170,8 @@ trait Reports
             $tolls = 0;
             if ($driver->tool_card) {
                 $tolls = TollPayment::where([
-                    'card' => $driver->tool_card->code
+                    'card' => $driver->tool_card->code,
+                    'tvde_week_id' => $tvde_week_id
                 ])
                     ->sum('total');
             }
