@@ -32,7 +32,6 @@ trait Reports
         $drivers = Driver::where('company_id', $company_id)
             ->where('state_id', 1)
             ->orderBy('name')
-            ->where('id', 15)
             ->get()
             ->load([
                 'contract_vat',
