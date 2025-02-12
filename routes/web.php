@@ -1,24 +1,8 @@
 <?php
 
-Route::get('down', function() {
-    Artisan::call('down');
-});
+//Route::redirect('/', '/admin');
 
-Route::redirect('/', '/admin');
-
-//Route::get('/', 'WebsiteController@index');
-
-Route::get('cms/{page_id}/{slug}', 'WebsiteController@cms');
-Route::post('form-data', 'WebsiteController@formData');
-Route::prefix('stand')->group(function () {
-    Route::get('/', 'StandController@index');
-    Route::get('viatura/{stand_car_id}', 'StandController@car');
-});
-Route::prefix('transfers-tours')->group(function () {
-    Route::get('/', 'TransferToursController@index');
-    Route::get('tour/{transfer_tour_id}', 'TransferToursController@tour');
-    Route::post('send-request', 'TransferToursController@sendRequest');
-});
+Route::get('/', 'WebsiteController@index');
 
 Auth::routes(['register' => false]);
 
