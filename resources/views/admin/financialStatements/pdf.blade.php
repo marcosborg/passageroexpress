@@ -310,7 +310,7 @@
         </tr>
     </table>
     <footer>
-        ExpertCom ©
+        PassageiroExpress ©
         <?php echo date("Y");?>
     </footer>
 </body>
